@@ -1,0 +1,132 @@
+Para crear una aplicación Android en Python que permita ingresar datos desde archivos Excel y tenga un dashboard de fácil visualización, puedes usar Kivy para la interfaz gráfica y KivyMD para componentes de Material Design. A continuación, te proporcionaré un ejemplo completo y ordenado que puedes copiar y pegar en Pydroid 3.
+
+### Estructura del Proyecto
+
+1. `main.py`
+2. `main.kv`
+3. `data.xlsx`
+
+### `main.py`
+
+```python
+from kivy.lang import Builder
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivymd.app import MDApp
+from kivymd.uix.datatables import MDDataTable
+from kivy.metrics import dp
+import pandas as pd
+
+class MainScreen(Screen):
+    pass
+
+class DashboardScreen(Screen):
+    def load_data(self, file_path):
+        try:
+            df = pd.read_excel(file_path)
+            self.display_data(df)
+        except Exception as e:
+            print(f"Error loading file: {e}")
+
+    def display_data(self, df):
+        table_data = df.values.tolist()
+        column_data = df.columns.tolist()
+        
+        table = MDDataTable(
+            size_hint=(0.9, 0.6),
+            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            column_data=[(col, dp(30)) for col in column_data],
+            row_data=table_data
+        )
+        
+        self.ids.data_layout.clear_widgets()
+        self.ids.data_layout.add_widget(table)
+
+class MyApp(MDApp):
+    def build(self):
+        self.theme_cls.primary_palette = "Blue"
+        return Builder.load_file('main.kv')
+
+if __name__ == '__main__':
+    MyApp().run()
+```
+
+### `main.kv`
+
+```kv
+ScreenManager:
+    MainScreen:
+    DashboardScreen:
+
+<MainScreen>:
+    name: 'main'
+    BoxLayout:
+        orientation: 'vertical'
+        MDToolbar:
+            title: "Análisis de Datos de Planta de Gas"
+            md_bg_color: app.theme_cls.primary_color
+            specific_text_color: 1, 1, 1, 1
+        MDFloatLayout:
+            MDRaisedButton:
+                text: "Cargar Datos"
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                on_release:
+                    app.root.current = 'dashboard'
+                    app.root.get_screen('dashboard').load_data('data.xlsx')
+
+<DashboardScreen>:
+    name: 'dashboard'
+    BoxLayout:
+        orientation: 'vertical'
+        MDToolbar:
+            title: "Dashboard"
+            md_bg_color: app.theme_cls.primary_color
+            specific_text_color: 1, 1, 1, 1
+            left_action_items: [["arrow-left", lambda x: app.root.current = 'main']]
+        ScrollView:
+            id: data_layout
+            do_scroll_x: True
+            do_scroll_y: True
+```
+
+### `data.xlsx`
+
+Crea un archivo Excel llamado `data.xlsx` en el mismo directorio que tu script. Este archivo debe contener los datos que deseas visualizar en el dashboard. Aquí tienes un ejemplo de cómo podría verse:
+
+| Fecha       | Presión (psi) | Temperatura (°C) | Caudal (m³/h) |
+|-------------|---------------|------------------|---------------|
+| 2023-10-01  | 120           | 75               | 500           |
+| 2023-10-02  | 118           | 74               | 510           |
+| 2023-10-03  | 119           | 76               | 495           |
+| 2023-10-04  | 121           | 77               | 505           |
+| 2023-10-05  | 122           | 78               | 500           |
+| 2023-10-06  | 120           | 75               | 510           |
+| 2023-10-07  | 119           | 74               | 495           |
+| 2023-10-08  | 118           | 73               | 500           |
+| 2023-10-09  | 117           | 72               | 505           |
+| 2023-10-10  | 116           | 71               | 510           |
+| 2023-10-11  | 115           | 70               | 495           |
+| 2023-10-12  | 114           | 69               | 500           |
+| 2023-10-13  | 113           | 68               | 505           |
+| 2023-10-14  | 112           | 67               | 510           |
+| 2023-10-15  | 111           | 66               | 495           |
+
+### Instrucciones para Pydroid 3
+
+1. **Instalar Dependencias**: Abre Pydroid 3 y asegúrate de tener instalados los siguientes paquetes:
+    - Kivy
+    - KivyMD
+    - Pandas
+    - Openpyxl
+
+    Puedes instalarlos desde el gestor de paquetes de Pydroid 3.
+
+2. **Crear Archivos**:
+    - Crea un nuevo archivo en Pydroid 3 llamado `main.py` y copia el contenido del archivo `main.py` proporcionado anteriormente.
+    - Crea un nuevo archivo en Pydroid 3 llamado `main.kv` y copia el contenido del archivo `main.kv` proporcionado anteriormente.
+    - Crea un archivo Excel llamado `data.xlsx` con los datos de ejemplo proporcionados anteriormente y colócalo en el mismo directorio que `main.py`.
+
+3. **Ejecutar la Aplicación**:
+    - Abre `main.py` en Pydroid 3 y ejecuta el script. La aplicación debería iniciarse y mostrar la interfaz gráfica.
+    - Presiona el botón "Cargar Datos" para cargar y visualizar los datos del archivo Excel en el dashboard.
+
+Este ejemplo proporciona una base sólida para una aplicación Android en Python que permite ingresar datos desde archivos Excel y visualizarlos en un dashboard. Puedes expandir y personalizar esta base según tus necesidades específicas.
